@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Drawing</title>
+    <link rel="stylesheet" href="light.css" />
+  </head>
+
+  <body scroll="no" style="overflow: hidden">
+    <h1>Medical Image-Annotation/Correction Tool (Mi-ACT)</h1>
+    <noscript>
+      <strong>niivue requires JavaScript.</strong>
+    </noscript>
+
+    <label1> Upload Image: </label1>
+    <input type="file" id="myFile" accept=".nii, .nii.gz"/>
+    <br>
+    <label1> Upload Mask:  </label1>
+    <input type="file" id="mask" accept=".nii, .nii.gz"/>
+  
+    <header>
+      <!-- <button onClick="history.go(0);">Refresh Page</button> -->
+      <!-- <button onClick="window.location.reload();">Refresh Page1</button> -->
+      <label for="drawPen">Draw color:</label>
+      <select name="drawPen" id="drawPen">
+        <option value="-1">Off</option>
+        <option value="0">Erase</option>
+        <option value="1">Red</option>
+        <option value="2">Green</option>
+        <option value="3">Blue</option>
+        <option value="4">Yellow</option>
+        <option value="5">Cyan</option>
+        <option value="6">Purple</option>
+        <option value="8">Filled Erase</option>
+        <option value="9">Filled Red</option>
+        <option value="10">Filled Green</option>
+        <option value="11">Filled Blue</option>
+        <option value="20">Filled Yellow</option>
+        <option value="13">Filled Cyan</option>
+        <option value="14">Filled Purple</option>
+
+        <option value="12">Erase Selected Cluster</option>
+      </select>
+        <!-- <br> -->
+        <button class="hov" id="save">Download Mask</button>
+        <!-- <br> -->
+        <button class="hov" id="undo">Undo</button>
+        <!-- <br> -->
+        <button class="hov" id="screenshot">Save screenshot</button>
+        <!-- <br> -->
+        <button class="hov" id="crosshair">Toggle Crosshair</button>
+        <!-- <br> -->
+        <button class="hov" id="zoom">Zoom</button>
+        <button class="hov" id="info">Volume Stats</button>
+        <!-- <br> -->
+        <label for="drawOpacity">Opacity</label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="80"
+          class="slider"
+          id="drawOpacity"
+        />
+        <!-- <br> -->
+        <label for="check1">Draw:Overwrite label</label>
+        <input type="checkbox" id="check1" name="check1" checked />
+        
+
+    </header>
+    <main id="container">
+      <canvas id="gl1"></canvas>
+    </main>
+  </body>
+
+  <img src="./pub/bii.PNG " width="150" height="60" class="topright">
+
+
+</html>
+<script src="./niivue.umd.js"></script>
+<script type="module" async>
+
+  document
+    .getElementById("drawOpacity")
+    .addEventListener("change", doDrawOpacity);
+  function doDrawOpacity() {
+    nv1.setDrawOpacity(this.value * 0.01);
+  }
+  document.getElementById("drawPen").addEventListener("change", doDrawPen);
+  function doDrawPen() {
+    const mode = parseInt(document.getElementById("drawPen").value);
+    nv1.setDrawingEnabled(mode >= 0);
+    if (mode >= 0) nv1.setPenValue(mode & 7, mode > 7);
+    if (mode === 12)
+      //erase selected cluster
+      nv1.setPenValue(-0);
+  }
+
+  document.getElementById("info").addEventListener("click", doInfo);
+  function doInfo() {
+    let obj = getVolume()
+    let str = JSON.stringify(obj, null, 2)
+    alert(str);
+  }
+
+  document.getElementById("undo").addEventListener("click", doUndo);
+  function doUndo() {
+    nv1.drawUndo();
+  }
+  document.getElementById("screenshot").addEventListener("click", doSaveSS);
+  function doSaveSS() {
+    nv1.saveScene("Screenshot.png");
+  }
+  document.getElementById("save").addEventListener("click", doSave);
+  function doSave() {
+    var file = filename[0];
+    var files = file.slice(0, -7);
+    var fileConcat = files.concat("Corr.nii.gz");
+    console.log(fileConcat)
+    nv1.saveImage(fileConcat, true);
+  }
+  document.getElementById("check1").addEventListener("change", doCheckClick);
+  function doCheckClick() {
+    nv1.drawFillOverwrites = this.checked;
+  }
+
+  document.getElementById("crosshair").addEventListener("click", doCrosshair);
+  var state = 0 
+  function doCrosshair() {
+    if (state == 0) {
+      nv1.setCrosshairWidth(0);
+      state = 1
+    } else {
+      nv1.setCrosshairWidth(3);
+      state = 0
+    }
+  }
+
+  document.getElementById("zoom").addEventListener("click", doZoom);
+  var state = 0 
+  function doZoom() {
+    if (state == 0) {
+      nv1.opts.dragMode = nv1.dragModes.pan;
+      state = 1
+    } else {
+      nv1.opts.dragMode = nv1.dragModes.none;
+      state = 0
+    }
+  }
+
+  //document.getElementById("3d").addEventListener("click", do3D);
+  //var state = 0 
+  //function do3D() {
+    //if (state == 0) {
+      //nv1.opts.multiplanarForceRender = true;
+      //nv1.setSliceType(nv1.sliceTypeMultiplanar);
+      //state = 1
+    //} else {
+      //nv1.opts.multiplanarForceRender = false;
+      //nv1.setSliceType(nv1.sliceTypeMultiplanar);
+      //state = 0
+    //}
+    //console.log()
+  //}
+
+  var filename = []
+  document.getElementById("myFile").addEventListener("change", doUpload);
+  function doUpload() {   
+    var file = document.getElementById('myFile');
+    filename.push(file.files[0].name)
+    var folderpath = "./images/"
+    var filepath = folderpath.concat(filename[0])
+    var volumeList1 = [{ url: String(filepath) }];
+    nv1.loadVolumes(volumeList1);
+  }
+
+  var maskName = []
+  document.getElementById("mask").addEventListener("change", doUploadMask);
+  function doUploadMask() {    
+    var file = document.getElementById('mask');
+    console.log(file)
+    maskName.push(file.files[0].name)
+    console.log(String(maskName[0]))
+    console.log(typeof(maskName[0]))
+    var folderpath = "./images/"
+    var filepath = folderpath.concat(maskName[0])
+    console.log(typeof(filepath))
+    console.log(filepath)
+    var volumeList1 = [{ url: String(filepath) }];
+    nv1.loadDrawingFromUrl(filepath);
+  }
+
+
+  function getVolume(){
+    let mm = nv1.volumes[0].hdr;
+    let volume_per_pix = mm.pixDims[1] * mm.pixDims[2] * mm.pixDims[3] * 1e-3
+  
+    let arr= nv1.drawBitmap;
+    const classes = new Set(arr)
+    const uniqueCount2 = {};
+
+    for (const element of arr){
+      if(uniqueCount2[element]){
+        uniqueCount2[element]+=1;
+      }
+      else{
+        uniqueCount2[element] = 1
+      }
+    }
+
+  const classVolume = [];
+  const n = classes.size;
+
+  let totalVoxelCount=0
+
+  for (let i = 1; i < n; i++) {
+     totalVoxelCount += uniqueCount2[i]
+  };
+
+  console.log(totalVoxelCount)
+
+  for (let i = 1; i < n; i++) {
+      classVolume.push({
+      class:   i,
+      voxelCount:uniqueCount2[i],
+      volume_CC: ((uniqueCount2[i]*volume_per_pix).toFixed(4)),
+      volume_percent: ((uniqueCount2[i]/totalVoxelCount)* 100).toFixed(2)
+  });
+  }
+  return classVolume
+  }
+
+
+  //var volumeList1 = [{ url: "../images/Subject102_inphase_N4BiasCorr_thigh_segment_imageSeg_multiRes.nii.gz" }];
+  var nv1 = new niivue.Niivue({
+    backColor: [0, 0, 0, 0]
+  });
+  nv1.setRadiologicalConvention(false);
+  //nv1.opts.multiplanarForceRender = true;
+  nv1.attachTo("gl1");
+  //await nv1.loadVolumes(volumeList1);
+  nv1.setCrosshairWidth(3);
+  nv1.setSliceType(nv1.sliceTypeMultiplanar);
+  //await nv1.loadDrawingFromUrl("../images/Subject102_inphase_N4BiasCorr_thigh_segment_imageSeg_multiRes.nii.gz");
+
+</script>
