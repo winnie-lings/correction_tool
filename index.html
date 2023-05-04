@@ -133,7 +133,7 @@
       nv1.setCrosshairWidth(0);
       state = 1
     } else {
-      nv1.setCrosshairWidth(3);
+      nv1.setCrosshairWidth(1);
       state = 0
     }
   }
@@ -240,8 +240,8 @@
   nv1.setRadiologicalConvention(false);
   //nv1.opts.multiplanarForceRender = true;
   nv1.attachTo("gl1");
-  //await nv1.loadVolumes(volumeList1);
-  nv1.setCrosshairWidth(3);
+  await nv1.loadVolumes(volumeList1);
+  nv1.setCrosshairWidth(1);
   nv1.setSliceType(nv1.sliceTypeMultiplanar);
   await nv1.loadDrawingFromUrl("./images/subject_11_T1_image_gt.nii.gz");
 
