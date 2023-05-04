@@ -14,11 +14,11 @@
       <strong>niivue requires JavaScript.</strong>
     </noscript>
 
-    <label1> Upload Image: </label1>
+<!--     <label1> Upload Image: </label1>
     <input type="file" id="myFile" accept=".nii, .nii.gz"/>
     <br>
     <label1> Upload Mask:  </label1>
-    <input type="file" id="mask" accept=".nii, .nii.gz"/>
+    <input type="file" id="mask" accept=".nii, .nii.gz"/> -->
   
     <header>
       <!-- <button onClick="history.go(0);">Refresh Page</button> -->
@@ -165,32 +165,32 @@
     //console.log()
   //}
 
-  var filename = []
-  document.getElementById("myFile").addEventListener("change", doUpload);
-  function doUpload() {   
-    var file = document.getElementById('myFile');
-    filename.push(file.files[0].name)
-    var folderpath = "./images/"
-    var filepath = folderpath.concat(filename[0])
-    var volumeList1 = [{ url: String(filepath) }];
-    nv1.loadVolumes(volumeList1);
-  }
+//   var filename = []
+//   document.getElementById("myFile").addEventListener("change", doUpload);
+//   function doUpload() {   
+//     var file = document.getElementById('myFile');
+//     filename.push(file.files[0].name)
+//     var folderpath = "./images/"
+//     var filepath = folderpath.concat(filename[0])
+//     var volumeList1 = [{ url: String(filepath) }];
+//     nv1.loadVolumes(volumeList1);
+//   }
 
-  var maskName = []
-  document.getElementById("mask").addEventListener("change", doUploadMask);
-  function doUploadMask() {    
-    var file = document.getElementById('mask');
-    console.log(file)
-    maskName.push(file.files[0].name)
-    console.log(String(maskName[0]))
-    console.log(typeof(maskName[0]))
-    var folderpath = "./images/"
-    var filepath = folderpath.concat(maskName[0])
-    console.log(typeof(filepath))
-    console.log(filepath)
-    var volumeList1 = [{ url: String(filepath) }];
-    nv1.loadDrawingFromUrl(filepath);
-  }
+//   var maskName = []
+//   document.getElementById("mask").addEventListener("change", doUploadMask);
+//   function doUploadMask() {    
+//     var file = document.getElementById('mask');
+//     console.log(file)
+//     maskName.push(file.files[0].name)
+//     console.log(String(maskName[0]))
+//     console.log(typeof(maskName[0]))
+//     var folderpath = "./images/"
+//     var filepath = folderpath.concat(maskName[0])
+//     console.log(typeof(filepath))
+//     console.log(filepath)
+//     var volumeList1 = [{ url: String(filepath) }];
+//     nv1.loadDrawingFromUrl(filepath);
+//   }
 
 
   function getVolume(){
@@ -233,7 +233,7 @@
   }
 
 
-  //var volumeList1 = [{ url: "../images/Subject102_inphase_N4BiasCorr_thigh_segment_imageSeg_multiRes.nii.gz" }];
+  var volumeList1 = [{ url: "../images/subject_11_T1_image.nii.gz" }];
   var nv1 = new niivue.Niivue({
     backColor: [0, 0, 0, 0]
   });
@@ -243,6 +243,6 @@
   //await nv1.loadVolumes(volumeList1);
   nv1.setCrosshairWidth(3);
   nv1.setSliceType(nv1.sliceTypeMultiplanar);
-  //await nv1.loadDrawingFromUrl("../images/Subject102_inphase_N4BiasCorr_thigh_segment_imageSeg_multiRes.nii.gz");
+  await nv1.loadDrawingFromUrl("../images/subject_11_T1_image_gt.nii.gz");
 
 </script>
