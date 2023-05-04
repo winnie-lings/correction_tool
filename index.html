@@ -233,7 +233,7 @@
   }
 
 
-  var volumeList1 = [{ url: "../images/subject_11_T1_image.nii.gz" }];
+  var volumeList1 = [{ url: "./images/subject_11_T1_image.nii.gz" }];
   var nv1 = new niivue.Niivue({
     backColor: [0, 0, 0, 0]
   });
@@ -243,6 +243,6 @@
   //await nv1.loadVolumes(volumeList1);
   nv1.setCrosshairWidth(3);
   nv1.setSliceType(nv1.sliceTypeMultiplanar);
-  await nv1.loadDrawingFromUrl("../images/subject_11_T1_image_gt.nii.gz");
+  await nv1.loadDrawingFromUrl("./images/subject_11_T1_image_gt.nii.gz");
 
 </script>
