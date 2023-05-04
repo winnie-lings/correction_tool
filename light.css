@@ -20,7 +20,7 @@ body {
   margin: 0px;
   min-height: 100%;
   width: 100%;
-  position: absolute;
+  position: fixed;
   font-family: system-ui, Arial, Helvetica, sans-serif;
   background: #000000;
   color: white;
