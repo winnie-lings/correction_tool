@@ -133,4 +133,6 @@ button {
   position: absolute;
   right: 10%;
   top: 10%;
+  width: 20%;
+  height: 20%;
 }
